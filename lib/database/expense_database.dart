@@ -12,7 +12,7 @@ class ExpenseDatabase extends ChangeNotifier {
   */
 
 //initialize db
-  static Future<void> initialize() async{
+  static Future<void> initialize() async {
     final dir = await getApplicationSupportDirectory();
     isar = await Isar.open([ExpenseSchema], directory: dir.path);
   }
@@ -21,7 +21,7 @@ class ExpenseDatabase extends ChangeNotifier {
   getters
   */
 
-  List<Expense> get allExpenses => _allExpenses;
+  List<Expense> get allExpense => _allExpenses;
 
 /*
   operations
@@ -52,7 +52,9 @@ class ExpenseDatabase extends ChangeNotifier {
   //update - edit an expense in db
   Future<void> updateExpense(int id, Expense updateExpense) async {
     //make sure new expense has same id as existing one
-    updateExpense.id = id;  ///check
+    updateExpense.id = id;
+
+    ///check
 
     //update in db
     await isar.writeTxn(() => isar.expenses.put(updateExpense));

@@ -120,5 +120,4 @@ Widget getBottomTitles(double value, TitleMeta meta) {
         text,
         style: textstyle,
       ));
-  // return SideTitleWidget(child: Text(text,style: textstyle,),axisSide :meta.axisSide);
 }

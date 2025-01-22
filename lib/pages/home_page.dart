@@ -1,3 +1,4 @@
+import 'package:expense_track/components/my_list_tile.dart';
 import 'package:expense_track/database/expense_database.dart';
 import 'package:expense_track/helpers/helper_functions.dart';
 import 'package:expense_track/models/expense.dart';
@@ -62,9 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
               Expense individualExpense = value.allExpense[index];
 
               //return list title UI
-              return ListTile(
-                title: Text(individualExpense.name),
-                trailing: Text(individualExpense.amount.toString()),
+              return MyListTile(
+                title: individualExpense.name,
+                trailing: formatAmount(individualExpense.amount),
               );
             }),
         floatingActionButton: FloatingActionButton(

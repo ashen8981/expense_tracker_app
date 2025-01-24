@@ -21,3 +21,10 @@ int calculateMonthCount(int startYear, startMonth, currentYear, currentMonth) {
   int monthCount = (currentYear - startYear) * 12 + currentMonth - startMonth + 1;
   return monthCount;
 }
+
+//get current month name
+String getCurrentMonthName() {
+  DateTime now = DateTime.now();
+  List<String> months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  return months[now.month - 1]; // Get the current month by using the month index
+}

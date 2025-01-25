@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'individual_bar.dart';
 
 class MyBarGraph extends StatefulWidget {
-  final List<double> monthlySummary; //[25, 500, 100]
-  final int startMonth; //0 JAN, 1 FEB
+  final List<double> monthlySummary; // Example: [25, 500, 100]
+  final int startMonth; // 0 = JAN, 1 = FEB
 
   const MyBarGraph({
     super.key,
@@ -17,58 +17,61 @@ class MyBarGraph extends StatefulWidget {
 }
 
 class _MyBarGraphState extends State<MyBarGraph> {
-  // This list will hold the data for each bar
+  // List to hold bar data
   List<IndividualBar> barData = [];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    //we need to scroll latest month automatically
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => scrollToEnd());
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToEnd());
+    initializeBarData();
   }
 
   // Initialize bar data
   void initializeBarData() {
+    int currentMonthIndex = DateTime.now().month - 1; // 0-based index for months
+    int totalMonths = (DateTime.now().year - 2024) * 12 + (currentMonthIndex - widget.startMonth + 1);
+    totalMonths = totalMonths < 12 ? 12 : totalMonths; // Ensure at least 12 months are shown
+
     barData = List.generate(
-      widget.monthlySummary.length,
-      (index) => IndividualBar(
-        x: index,
-        y: widget.monthlySummary[index],
-      ),
+      totalMonths,
+      (index) {
+        double yValue = 0;
+        if (index < widget.monthlySummary.length) {
+          yValue = widget.monthlySummary[index]; // Use existing data
+        }
+        return IndividualBar(
+          x: index,
+          y: yValue,
+        );
+      },
     );
   }
 
-  //calculate max for upper limit of graph
+  // Calculate maximum Y value for the graph
   double calculateMax() {
     //initially 500,but adjust if spending more than that
     double max = 500;
-
-    //get the month with the highest amount
-    widget.monthlySummary.sort();
-
-    //increase the upper limit by a bit
-    max = widget.monthlySummary.last * 1.05;
-
-    if (max < 500) {
-      return max;
+    if (widget.monthlySummary.isNotEmpty) {
+      double maxData = widget.monthlySummary.reduce((a, b) => a > b ? a : b);
+      max = maxData * 1.05; // Slightly increase the limit
     }
-
-    return max;
+    return max < 500 ? 500 : max;
   }
 
-  //scroll controller to make sure it scrolls to the end/ last month
-  final ScrollController _scrollController = ScrollController();
+  // Scroll to the end of the graph
   void scrollToEnd() {
-    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-        duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(seconds: 1),
+      curve: Curves.fastOutSlowIn,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    //initialize upon build
-    initializeBarData();
-
-    //bar dimension sizes
+    // Bar dimensions
     double barWidth = 20;
     double spaceBetweenBars = 15;
 
@@ -81,40 +84,45 @@ class _MyBarGraphState extends State<MyBarGraph> {
           width: barWidth * barData.length + spaceBetweenBars * (barData.length - 1),
           child: BarChart(
             BarChartData(
-                minY: 0,
-                maxY: calculateMax(),
-                gridData: const FlGridData(show: false),
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  show: true,
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: getBottomTitles,
-                    ),
+              minY: 0,
+              maxY: calculateMax(),
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                show: true,
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: getBottomTitles,
                   ),
                 ),
-                barGroups: barData
-                    .map(
-                      (data) => BarChartGroupData(
-                        x: data.x,
-                        barRods: [
-                          BarChartRodData(
-                              toY: data.y,
-                              width: barWidth,
-                              borderRadius: BorderRadius.circular(4),
-                              color: Colors.grey.shade800,
-                              backDrawRodData:
-                                  BackgroundBarChartRodData(show: true, toY: calculateMax(), color: Colors.white)),
-                        ],
-                      ),
-                    )
-                    .toList(),
-                alignment: BarChartAlignment.center,
-                groupsSpace: spaceBetweenBars),
+              ),
+              barGroups: barData
+                  .map(
+                    (data) => BarChartGroupData(
+                      x: data.x,
+                      barRods: [
+                        BarChartRodData(
+                          toY: data.y,
+                          width: barWidth,
+                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.grey.shade800,
+                          backDrawRodData: BackgroundBarChartRodData(
+                            show: true,
+                            toY: calculateMax(),
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  .toList(),
+              alignment: BarChartAlignment.center,
+              groupsSpace: spaceBetweenBars,
+            ),
           ),
         ),
       ),
@@ -122,9 +130,9 @@ class _MyBarGraphState extends State<MyBarGraph> {
   }
 }
 
-//bottom titles
+// Bottom titles widget
 Widget getBottomTitles(double value, TitleMeta meta) {
-  const textstyle = TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 14);
+  const textStyle = TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 14);
   String text;
   switch (value.toInt() % 12) {
     case 0:
@@ -164,13 +172,14 @@ Widget getBottomTitles(double value, TitleMeta meta) {
       text = 'D'; // December
       break;
     default:
-      text = ''; // Default case if no match is found
+      text = '';
   }
 
   return SideTitleWidget(
-      meta: meta,
-      child: Text(
-        text,
-        style: textstyle,
-      ));
+    meta: meta,
+    child: Text(
+      text,
+      style: textStyle,
+    ),
+  );
 }

@@ -20,6 +20,7 @@ dependencies:
   intl: ^0.20.1
   flutter_slidable: ^4.0.0
   fl_chart: ^0.70.2
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
@@ -30,5 +31,15 @@ dev_dependencies:
   build_runner: ^2.4.13
 
 flutter:
-
+  assets:
+    - assets/splash_icon.png
   uses-material-design: true
+
+flutter_native_splash:
+  color: "#F5F5DC"
+  image: assets/splash_icon.png
+  android_12:
+    image: assets/splash_icon.png
+    color: "#F5F5DC"
+  fullscreen: true
+

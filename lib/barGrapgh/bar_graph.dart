@@ -172,7 +172,7 @@ Widget getBottomTitles(double value, TitleMeta meta) {
       text = 'D'; // December
       break;
     default:
-      text = '';
+      text = ''; // Default
   }
 
   return SideTitleWidget(

@@ -36,34 +36,49 @@ class _MyBarGraphState extends State<MyBarGraph> {
     //initialize upon build
     initializeBarData();
 
-    return BarChart(
-      BarChartData(
-        minY: 0,
-        maxY: 100,
-        gridData: const FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          show: true,
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: getBottomTitles,
+    //bar dimension sizes
+    double barWidth = 20;
+    double spaceBetweenBars = 15;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: barWidth * barData.length + spaceBetweenBars * (barData.length - 1),
+        child: BarChart(
+          BarChartData(
+            minY: 0,
+            maxY: 100,
+            gridData: const FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              show: true,
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: getBottomTitles,
+                ),
+              ),
             ),
+            barGroups: barData
+                .map(
+                  (data) => BarChartGroupData(
+                    x: data.x,
+                    barRods: [
+                      BarChartRodData(
+                          toY: data.y,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.grey.shade800,
+                          backDrawRodData: BackgroundBarChartRodData(show: true, toY: 100, color: Colors.white)),
+                    ],
+                  ),
+                )
+                .toList(),
           ),
         ),
-        barGroups: barData
-            .map(
-              (data) => BarChartGroupData(
-                x: data.x,
-                barRods: [
-                  BarChartRodData(toY: data.y),
-                ],
-              ),
-            )
-            .toList(),
       ),
     );
   }
@@ -73,7 +88,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
 Widget getBottomTitles(double value, TitleMeta meta) {
   const textstyle = TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 14);
   String text;
-  switch (value.toInt()) {
+  switch (value.toInt() % 12) {
     case 0:
       text = 'J'; // January
       break;

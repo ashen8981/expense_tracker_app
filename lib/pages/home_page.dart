@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:expense_track/barGrapgh/bar_graph.dart';
 import 'package:expense_track/components/my_list_tile.dart';
 import 'package:expense_track/database/expense_database.dart';
@@ -131,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //only display the expenses for the current month
       //return UI
       return Scaffold(
+        backgroundColor: Colors.grey.shade300,
         body: SafeArea(
           child: Column(
             children: [
